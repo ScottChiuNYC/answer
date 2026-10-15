@@ -1,0 +1,30 @@
+name: Source artifact
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+          ctest --test-dir build --output-on-failure
+      - name: Assemble standalone source archive
+        shell: bash
+        run: |
+          mkdir -p staging/answer-0.1.0
+          cp -R CMakeLists.txt LICENSE include src cmake tests vcpkg-ports staging/answer-0.1.0/
+          tar -C staging -czf answer-0.1.0-source.tar.gz answer-0.1.0
+          (cd staging && zip -qr ../answer-0.1.0-source.zip answer-0.1.0)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: answer-source
+          path: |
+            answer-0.1.0-source.tar.gz
+            answer-0.1.0-source.zip
+          if-no-files-found: error
