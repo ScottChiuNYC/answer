@@ -1,0 +1,6 @@
+{
+  "name": "answer",
+  "version": "0.1.0",
+  "description": "Minimal C++ answer() smoke test",
+  "license": "MIT"
+}
